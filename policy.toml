@@ -1,0 +1,8 @@
+# What a manifest in manifests/ may pin. Read by the core's pkg.py (load_policy); a change here is a reviewed pull request (CODEOWNERS).
+licences = ["MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "ISC", "MPL-2.0", "GPL-3.0-only", "GPL-3.0-or-later", "AGPL-3.0-only", "AGPL-3.0-or-later"]
+hosts = ["github.com", "gitlab.com", "codeberg.org"]
+kinds = ["recipe", "extension", "blueprint"]
+max_folder_bytes = 2097152   # all text files of one package folder together
+max_file_bytes = 262144      # one text file
+max_files = 200              # files in one package folder
+max_binary_bytes = 1048576   # one binary file (icon, screenshot)

@@ -1,0 +1,85 @@
+# Build, sign and publish the package index of hobnix/community (hobnix/core#1076). A caller of the shared workflow of the core.
+# One branch (main), so the schedule runs on main and signs directly: no `daily` dispatch job.
+# - pull_request: `build` only (prints what the pin change does into the job summary); sign, mirror and publish are skipped.
+# - push to main / daily / workflow_dispatch: build, sign (environment `index-signing`), mirror the pins commit to branch `pins`, publish to Pages.
+# Pinned to a full commit SHA of hobnix/core in every `uses:`, `ref:` and `core_ref`; bump by a reviewed pull request.
+name: index
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: index-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    uses: hobnix/core/.github/workflows/package-index.yml@4b9b93735cd652bb7e30797fcbcd35e3f11c4e5e
+    with:
+      repo_id: community
+      core_ref: 4b9b93735cd652bb7e30797fcbcd35e3f11c4e5e
+      pages_url: https://packages.hobnix.dev/community
+      assemble: true
+      official_index: https://packages.hobnix.dev/official/index.json
+  sign:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: index-signing
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          repository: hobnix/core
+          ref: 4b9b93735cd652bb7e30797fcbcd35e3f11c4e5e
+          path: core
+      - uses: actions/download-artifact@v4
+        with:
+          name: index
+          path: site
+      - uses: ./core/.github/actions/index-sign
+        with:
+          key: ${{ secrets.INDEX_SIGNING_KEY }}
+          repo_id: community
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+  mirror:
+    needs: sign
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: pins
+          path: pins
+      - run: |
+          url="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}"
+          git init -q mirror
+          git -C mirror fetch -q "$url" pins:refs/heads/pins || true   # the first run has no pins branch
+          if [ -f pins/pins.bundle ]; then      # no bundle: the tree did not change, the commit is on `pins` already
+            git -C mirror fetch -q ../pins/pins.bundle pins:refs/heads/pins
+            git -C mirror push -q "$url" "$(cat pins/pins.commit):refs/heads/pins"
+          fi
+  publish:
+    needs: [sign, mirror]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/deploy-pages@v4
