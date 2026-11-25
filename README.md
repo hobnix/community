@@ -28,6 +28,14 @@ To release a new version: raise `version` in your `package.toml`, push, and open
 
 Community packages are not reviewed line by line: read what a package asks for (permissions) before you install it.
 
+## Tiers: Official, Verified, Community
+
+- **Official**: `hobnix/official`, signed with a key shipped in the core.
+- **Verified**: this repository. A maintainer reviewed the pull request that pins the commit, and CI signs the index (https://packages.hobnix.dev/community). A new commit is a new review. Verified is not an audit of every line.
+- **Community**: any other repository a user adds with `hs pkg repo add <index-url>`, signed with its own key, shown as Unverified.
+
+Details: docs/PLAN-registry.md in https://github.com/hobnix/core. The index is published and answers today but lists no package yet. Not tested on hardware yet: installing a community package on a server.
+
 ## Maintainers
 
 `.github/` and `policy.toml` are owned by the maintainers (`.github/CODEOWNERS`): a pull request runs its own copy of both. Not tested on hardware yet.
