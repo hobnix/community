@@ -21,10 +21,10 @@ concurrency:
 
 jobs:
   build:
-    uses: hobnix/core/.github/workflows/package-index.yml@4b9b93735cd652bb7e30797fcbcd35e3f11c4e5e
+    uses: hobnix/core/.github/workflows/package-index.yml@b7467cad6445b85f44929e3b539df300cdc50b88
     with:
       repo_id: community
-      core_ref: 4b9b93735cd652bb7e30797fcbcd35e3f11c4e5e
+      core_ref: b7467cad6445b85f44929e3b539df300cdc50b88
       pages_url: https://packages.hobnix.dev/community
       assemble: true
       official_index: https://packages.hobnix.dev/official/index.json
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           repository: hobnix/core
-          ref: 4b9b93735cd652bb7e30797fcbcd35e3f11c4e5e
+          ref: b7467cad6445b85f44929e3b539df300cdc50b88
           path: core
       - uses: actions/download-artifact@v4
         with:
