@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/hobnix/core/HEAD/.github/branding/banner@2x.webp" alt="hobnix" width="100%"></p>
+
 # hobnix/community
 
 Community packages for Hobnix servers. This repository holds no code: each package is a small **manifest** in `manifests/` that pins one commit of a
